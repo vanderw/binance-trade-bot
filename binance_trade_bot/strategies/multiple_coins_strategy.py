@@ -16,8 +16,11 @@ class Strategy(AutoTrader):
         if current_coin is not None:
             current_coin_symbol = current_coin.symbol
 
+        all_balances = self.manager.get_currency_balance_all()
         for coin in self.db.get_coins():
-            current_coin_balance = self.manager.get_currency_balance(coin.symbol)
+            current_coin_balance = self.manager.find_coin_balance_from(
+                coin.symbol, all_balances
+            )  # self.manager.get_currency_balance(coin.symbol)
             coin_price = all_tickers.get_price(coin + self.config.BRIDGE)
 
             if coin_price is None:

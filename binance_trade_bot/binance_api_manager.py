@@ -78,14 +78,23 @@ class BinanceAPIManager:
                 return float(ticker["price"])
         return None
 
+    def get_currency_balance_all(self) -> List[Dict]:
+        return self.binance_client.get_account()["balances"]
+
+    @staticmethod
+    def find_coin_balance_from(currency_symbol: str, all_balances: List[Dict]):
+        """ helper function to reduce API calling rate """
+        for currency_balance in all_balances:
+            if currency_balance["asset"] == currency_symbol:
+                return float(currency_balance["free"])
+        return None
+
     def get_currency_balance(self, currency_symbol: str):
         """
         Get balance of a specific coin
         """
-        for currency_balance in self.binance_client.get_account()["balances"]:
-            if currency_balance["asset"] == currency_symbol:
-                return float(currency_balance["free"])
-        return None
+        all_balances = self.get_currency_balance_all()
+        return BinanceAPIManager.find_coin_balance_from(currency_symbol, all_balances)
 
     def retry(self, func, *args, **kwargs):
         time.sleep(1)
