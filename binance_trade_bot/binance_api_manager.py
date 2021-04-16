@@ -11,6 +11,8 @@ from .database import Database
 from .logger import Logger
 from .models import Coin
 
+COMMON_API_TTL = 86400
+
 
 class AllTickers:  # pylint: disable=too-few-public-methods
     def __init__(self, all_tickers: List[Dict]):
@@ -32,11 +34,11 @@ class BinanceAPIManager:
         self.logger = logger
         self.config = config
 
-    @cached(cache=TTLCache(maxsize=1, ttl=43200))
+    @cached(cache=TTLCache(maxsize=1, ttl=COMMON_API_TTL))
     def get_trade_fees(self) -> Dict[str, float]:
         return {ticker["symbol"]: ticker["taker"] for ticker in self.binance_client.get_trade_fee()["tradeFee"]}
 
-    @cached(cache=TTLCache(maxsize=1, ttl=60))
+    @cached(cache=TTLCache(maxsize=1, ttl=COMMON_API_TTL))
     def get_using_bnb_for_fees(self):
         return self.binance_client.get_bnb_burn_spot_margin()["spotBNBBurn"]
 
